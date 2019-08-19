@@ -9,6 +9,8 @@
  * Author:      Ben Nasedkin
  * Author URI:  nasedk.in
  * License:     GNU GENERAL PUBLIC LICENSE
+ * GitHub Plugin URI: nasedkinpv/gotenberg-pdf
+ * GitHub Plugin URI: https://github.com/nasedkinpv/gotenberg-pdf
  * 
  */
 require "vendor/autoload.php";
@@ -25,16 +27,17 @@ if (!defined("ABSPATH")) {
 /** Class Gotenberg PDF Plugin */
 class Gotenberg
 {
+    const DEBUG = 1;
     private $webserver = 'http://nginx:80';
     private $gotenberg = 'http://gotenberg:3000';
     private $query_print = '?print';
-    private $query_pdf = 'pdfg';
+    private $query_pdf = 'pdftest';
     private $post_type = 'yacht';
 
     function __construct()
     {
         $options = get_option('gotenberg_pdf_settings');
-        $this->webserver = $options['webserver_uri'];
+        $this->webserver = $options['webserver_uri'] ?: $this->webserver;
         $this->pdf_folder = get_stylesheet_directory() . '/print/';
     }
     function watch_query_and_post_type()
@@ -45,8 +48,7 @@ class Gotenberg
             $this->filename = self::get_pdf_filename();
             $this->file_path = $this->pdf_folder . $this->filename;
             $this->file_uri = get_stylesheet_directory_uri() . '/print/' . $this->filename;
-            // var_dump($this);
-            flush();
+            if ($this::DEBUG) var_dump($this);
             switch ($_REQUEST[$this->query_pdf]) {
                 case 1:
                     // regular download, if not exist create, if exist download.
@@ -116,9 +118,12 @@ class Gotenberg
     {
         $client = new Client($this->gotenberg, new \Http\Adapter\Guzzle6\Client());
         $request = new URLRequest($url);
-        $request->setMargins(Request::NO_MARGINS);
-        $dest = $filepath;
-        $client->store($request, $dest);
+        // $request->setAssets($assets);
+        $request->setPaperSize(URLRequest::A4);
+        $request->setMargins(URLRequest::NO_MARGINS);
+        $request->setWaitDelay(2.5);
+        $request->setWaitTimeout(10);
+        $client->store($request, $filepath);
         return $request;
     }
 }

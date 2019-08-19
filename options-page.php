@@ -69,7 +69,7 @@ function webserver_uri_render()
 
     $options = get_option('gotenberg_pdf_settings');
     ?>
-<input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?php echo $options['webserver_uri']; ?>' placeholder="http://nginx:80/">
+<input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?php echo $options['webserver_uri']; ?>' placeholder="http://nginx:80">
 <?php
 
 }
@@ -80,7 +80,7 @@ function gotenberg_uri_render()
 
     $options = get_option('gotenberg_pdf_settings');
     ?>
-<input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?php echo $options['gotenberg_uri']; ?>' placeholder="http://gotenberg:3000/">
+<input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?php echo $options['gotenberg_uri']; ?>' placeholder="http://gotenberg:3000">
 <?php
 
 }

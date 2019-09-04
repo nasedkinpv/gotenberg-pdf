@@ -31,7 +31,7 @@ $yacht = new Yacht;
     </section>
 
     <section class="yacht-specs" id="yacht-specs">
-      <? $specs = $yacht->fields->getFields(); ?>
+      <? $specs = $yacht->fields->getFields(false); ?>
       <div class="yacht-specs__header__wrapper">
         <div class="yacht-specs__header">
           Характеристики
@@ -143,7 +143,7 @@ $yacht = new Yacht;
     <? endif; ?>
 
     <section class="yacht-specs" id="yacht-specs">
-      <? $specs = $yacht->fields->getFields(); ?>
+      <? $specs = $yacht->fields->getFields($cf_enable = 1); ?>
       <div class="yacht-specs__header__wrapper flex-start">
         <div class="yacht-specs__header">
           Дополнительно

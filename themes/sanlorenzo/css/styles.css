@@ -1504,8 +1504,6 @@ footer {
     flex-basis: 50%;
     max-width: 50%;
     padding: 2rem; }
-  .yacht-line__label, .yacht-line__value {
-    margin: 0; }
   .yacht-line__label {
     font-size: 1.75rem;
     line-height: 3rem;
@@ -1528,7 +1526,10 @@ footer {
     text-transform: uppercase;
     letter-spacing: .1rem;
     text-align: right;
-    margin-bottom: 0; }
+    margin-bottom: 0;
+    margin-top: 0.5rem; }
+  .yacht-line__label, .yacht-line__value {
+    margin-top: 0.75rem; }
 
 .gallery-exterior, .gallery-interior {
   box-sizing: border-box;

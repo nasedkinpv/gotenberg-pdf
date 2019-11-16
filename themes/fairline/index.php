@@ -204,7 +204,7 @@ $yacht = new Yacht;
                               $image = wp_get_attachment_image_url($id, 'gallery');
                               echo '<div class="gallery-image" style="background-image: url(' . $image . ')"></div>';
                               if ($i % 2 == 0) echo '<div class="page-break"></div>';
-                              if ($i == 8) break;
+                              if ($i == 4) break;
                             } ?>
                     </div>
                     <div class="page-break"></div>

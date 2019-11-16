@@ -125,7 +125,7 @@ class Gotenberg
         $request = new URLRequest($url);
         // $request->setAssets($assets);
         $request->setPaperSize(URLRequest::A4);
-        $request->setMargins(URLRequest::NO_MARGINS);
+        $request->setMargins([0.2, 0.2, 0.2, 0.2]);
         $request->setWaitDelay(2.5);
         $request->setWaitTimeout(10);
 

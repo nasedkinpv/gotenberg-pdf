@@ -37,7 +37,7 @@ class Gotenberg
     private $query_print = 'print';
     private $query_pdf = 'pdf';
     private $post_type = 'yacht';
-    private $theme = 'sanlorenzo';
+    private $theme = 'fairline';
 
     function __construct()
     {

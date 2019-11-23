@@ -33,11 +33,11 @@ class Gotenberg
 {
     const DEBUG = 1;
     private $webserver = 'http://nginx:80';
-    private $gotenberg = 'http://gotenberg:3000';
+    private $gotenberg = 'http://localhost:3000';
     private $query_print = 'print';
     private $query_pdf = 'pdf';
     private $post_type = 'yacht';
-    private $theme = 'fairline';
+    private $theme = 'nordmarine';
 
     function __construct()
     {

@@ -18,8 +18,10 @@ require "vendor/autoload.php";
 include_once "options-page.php";
 
 use TheCodingMachine\Gotenberg\Client;
+use TheCodingMachine\Gotenberg\ClientException;
 use TheCodingMachine\Gotenberg\URLRequest;
 use TheCodingMachine\Gotenberg\Request;
+use TheCodingMachine\Gotenberg\RequestException;
 // use TheCodingMachine\Gotenberg\Request\setAssets;
 
 use TheCodingMachine\Gotenberg\DocumentFactory;
@@ -33,10 +35,10 @@ class Gotenberg
 {
     const DEBUG = 1;
     private $webserver = 'http://nginx:80';
-    private $gotenberg = 'http://localhost:3000';
+    private $gotenberg = 'http://gotenberg:3000';
     private $query_print = 'print';
     private $query_pdf = 'pdf';
-    private $post_type = 'yacht';
+    private $post_type = 'sale';
     private $theme = 'nordmarine';
 
     function __construct()
@@ -55,11 +57,11 @@ class Gotenberg
         }
         if (get_post_type() == $this->post_type and $this->mode) {
             $this->request_uri = self::get_uri_request();
-            $this->file_exist = self::check_pdf_exist();
             $this->filename = self::get_pdf_filename();
+            $this->file_exist = self::check_pdf_exist();
             $this->file_path = $this->pdf_folder . $this->filename;
             $this->file_uri = get_stylesheet_directory_uri() . '/print/' . $this->filename;
-            // if ($this::DEBUG) var_dump($this);
+            if ($this::DEBUG) var_dump($this);
             if ($this->mode) {
                 header('Content-type:application/pdf');
                 header('Content-Disposition:attachment; filename="' . $this->filename . '"');
@@ -123,14 +125,34 @@ class Gotenberg
     {
         $client = new Client($this->gotenberg, new \Http\Adapter\Guzzle6\Client());
         $request = new URLRequest($url);
-        // $request->setAssets($assets);
+        // // $request->setAssets($assets);
+        // $request->setPaperSize(URLRequest::A4);
+        // $request->setMargins([0.2, 0.2, 0.2, 0.2]);
+        // $request->setWaitDelay(2.5);
+        // $request->setWaitTimeout(10);
+
+        // $client->store($request, $filepath);
+        // return $request;
+
+        // try {
+        $request = new URLRequest($url);
         $request->setPaperSize(URLRequest::A4);
         $request->setMargins([0.2, 0.2, 0.2, 0.2]);
         $request->setWaitDelay(2.5);
         $request->setWaitTimeout(10);
-
+        // dd($this);
         $client->store($request, $filepath);
         return $request;
+        // return $client->post($request);
+        // } catch (RequestException $e) {
+        //     var_dump($this);
+        //     # this exception is thrown if given paper size or margins are not correct.
+        // } catch (ClientException $e) {
+        //     # this exception is thrown by the client if the API has returned a code != 200.
+        //     var_dump($this);
+        // } catch (\Exception $e) {
+        //     # some (random?) exception.
+        // }
     }
 }
 

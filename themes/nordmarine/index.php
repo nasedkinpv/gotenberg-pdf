@@ -1,4 +1,32 @@
 <?
+global $post;
+$post_term = wp_get_post_terms($post->ID, 'sale_type', array("fields" => "all"));
+$sale_type = $post_term[0]->slug;
+
+if (get_field('yacht_dol') > 0) {
+  $price['dol'] = number_format(str_replace(' ', '', get_field('yacht_dol')), 0, '.', ' ') . ' $';
+}
+
+if (get_field('yacht_eur') > 0) {
+  $price['eur'] = number_format(str_replace(' ', '', get_field('yacht_eur')), 0, '.', ' ') . ' €';
+}
+
+if (get_field('yacht_rub') > 0) {
+  $price['rub'] = number_format(str_replace(' ', '', get_field('yacht_rub')), 0, '.', ' ') . ' ₽';
+}
+
+if (get_field('yacht_pound') > 0) {
+  $price['pound'] = number_format(str_replace(' ', '', get_field('yacht_pound')), 0, '.', ' ') . ' £';
+}
+
+// Базовая валюта указанная в параметрах яхты
+$yCurrency = get_field('yacht_currency');
+
+//$price = $price[$_SESSION['currency_brockerage']];
+$price = $price[$yCurrency];
+
+$img = get_field('yacht_img');
+$state = get_field('state');
 $pdfRows = [
   'yacht_pdf_year' => [
     'unit' => 'год',

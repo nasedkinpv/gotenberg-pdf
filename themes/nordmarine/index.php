@@ -157,7 +157,7 @@ endif;
       </div>
       <div class="pdf-header__right">
         <div class="pdf-header__right-body">
-          <p class="pdf-header__price"><?= $price ?></p>
+          <p class="pdf-header__price"><?= @$price ?></p>
         </div>
       </div>
     </div>
@@ -290,7 +290,7 @@ endif;
         </div>
         <div class="pdf-header__right">
           <div class="pdf-header__right-body">
-            <p class="pdf-header__price"><?= $price ?></p>
+            <p class="pdf-header__price"><?= @$price ?></p>
           </div>
         </div>
       </div>
@@ -303,7 +303,7 @@ endif;
               ?>
             <div class="pdf-deck__item">
               <div class="pdf-deck__img"><img src="<? echo $plan['url']; ?>" alt="" title=""></div>
-              <p class="pdf-deck__text"><? the_field($field_name, $post->ID) ?></p>
+              <p class="pdf-deck__text"><? the_field($field_name, @$post->ID) ?></p>
             </div>
           <? endforeach; ?>
         </div>

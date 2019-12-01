@@ -40,7 +40,7 @@ class Gotenberg
     private $query_pdf = 'pdf';
     private $post_type = 'sale';
     private $theme = 'nordmarine';
-
+    private $margins = [];
     function __construct()
     {
         $options = get_option('gotenberg_pdf_settings');
@@ -61,7 +61,7 @@ class Gotenberg
             $this->file_exist = self::check_pdf_exist();
             $this->file_path = $this->pdf_folder . $this->filename;
             $this->file_uri = get_stylesheet_directory_uri() . '/print/' . $this->filename;
-            if ($this::DEBUG) var_dump($this);
+            // if ($this::DEBUG) var_dump($this);
             if ($this->mode) {
                 header('Content-type:application/pdf');
                 header('Content-Disposition:attachment; filename="' . $this->filename . '"');
@@ -136,10 +136,14 @@ class Gotenberg
 
         // try {
         $request = new URLRequest($url);
+        // $header = DocumentFactory::makeFromPath('header.html', __DIR__ . '/themes/nordmarine/header.html');
+        $footer = DocumentFactory::makeFromPath('footer.html', __DIR__ . '/themes/nordmarine/footer.html');
         $request->setPaperSize(URLRequest::A4);
-        $request->setMargins([0.2, 0.2, 0.2, 0.2]);
+        $request->setMargins([0.4, 0.75, 0.4, 0.4]);
         $request->setWaitDelay(2.5);
         $request->setWaitTimeout(10);
+        $request->setFooter($footer);
+        // $request->setHeader($header);
         // dd($this);
         $client->store($request, $filepath);
         return $request;

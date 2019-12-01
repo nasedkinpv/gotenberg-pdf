@@ -1,7 +1,6 @@
 {
-  "name": "sanlorenzo-russia-pdf-theme",
+  "name": "nordmarine-russia-pdf-theme",
   "version": "1.0.1",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "scss": "node-sass --watch scss -o css"
@@ -18,5 +17,7 @@
   "devDependencies": {
     "node-sass": "^4.12.0",
     "nodemon": "^1.19.1"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }

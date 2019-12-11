@@ -38,7 +38,7 @@ class Gotenberg
     private $gotenberg = 'http://gotenberg:3000';
     private $query_print = 'print';
     private $query_pdf = 'pdf';
-    private $post_type = 'sale';
+    private $post_type = 'sale' || 'page';
     private $theme = 'nordmarine';
     private $margins = [];
     function __construct()

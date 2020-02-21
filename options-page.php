@@ -68,8 +68,8 @@ function webserver_uri_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-    ?>
-<input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?php echo $options['webserver_uri']; ?>' placeholder="http://nginx:80">
+?>
+    <input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?= $options['webserver_uri'] ?: 'http://nginx:80' ?>'>
 <?php
 
 }
@@ -79,8 +79,8 @@ function gotenberg_uri_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-    ?>
-<input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?php echo $options['gotenberg_uri']; ?>' placeholder="http://gotenberg:3000">
+?>
+    <input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?= $options['gotenberg_uri'] ?: 'http://gotenberg:3000' ?>'>
 <?php
 
 }
@@ -90,8 +90,8 @@ function query_for_print_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-    ?>
-<input type='text' name='gotenberg_pdf_settings[query_for_print]' value='<?php echo $options['query_for_print']; ?>' placeholder="?print">
+?>
+    <input type='text' name='gotenberg_pdf_settings[query_for_print]' value='<?= $options['query_for_print'] ?: 'print' ?>'>
 <?php
 
 }
@@ -101,8 +101,8 @@ function query_for_pdf_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-    ?>
-<input type='text' name='gotenberg_pdf_settings[query_for_pdf]' value='<?php echo $options['query_for_pdf']; ?>' placeholder="?pdf">
+?>
+    <input type='text' name='gotenberg_pdf_settings[query_for_pdf]' value='<?= $options['query_for_pdf'] ?: 'pdf' ?>'>
 <?php
 
 }
@@ -112,8 +112,8 @@ function custom_post_type_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-    ?>
-<input type='text' name='gotenberg_pdf_settings[custom_post_type]' value='<?php echo $options['custom_post_type']; ?>' placeholder="yacht">
+?>
+    <input type='text' name='gotenberg_pdf_settings[custom_post_type]' value='<?= $options['custom_post_type'] ?: 'yacht' ?>'>
 <?php
 
 }
@@ -129,18 +129,18 @@ function gotenberg_pdf_settings_section_callback()
 function gotenberg_pdf_options_page()
 {
 
-    ?>
-<form action='options.php' method='post'>
+?>
+    <form action='options.php' method='post'>
 
-    <h2>Gotenberg Docker Settings</h2>
+        <h2>Gotenberg Docker Settings</h2>
 
-    <?php
+        <?php
         settings_fields('pluginPage');
         do_settings_sections('pluginPage');
         submit_button();
         ?>
 
-</form>
+    </form>
 <?php
 
 }

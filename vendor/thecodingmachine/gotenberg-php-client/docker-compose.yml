@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  php:
+    image: thecodingmachine/php:7.2-v2-cli
+    container_name: php
+    environment:
+      - PHP_EXTENSION_XDEBUG=1
+    restart: 'no'
+    volumes:
+      - ./:/usr/src/app:rw
+
+  gotenberg:
+    image: thecodingmachine/gotenberg:5.0.0
+    container_name: gotenberg
+    restart: 'no'

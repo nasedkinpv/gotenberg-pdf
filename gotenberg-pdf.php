@@ -108,15 +108,12 @@ if (!class_exists('GOTENGERG_SERVICE')) :
         public function run()
         {
             // check post type
-            echo is_page_template($this->custom_page_template);
-
             if ($this->check_service()) {
                 if (get_post_type() == $this->custom_post_type)
-                    $fallback = false;
+                    $exit = false;
                 if (is_page_template($this->custom_page_template))
-                    $fallback = false;
-                if ($fallback) return null;
-
+                    $exit = false;
+                if ($exit) return null;
                 // check non-related request
                 if (
                     !isset($_REQUEST[$this->query_for_pdf]) &&

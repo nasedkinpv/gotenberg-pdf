@@ -5,10 +5,11 @@
  * Plugin Name: Gotenberg PDF
  * Plugin URI:  https://github.com/nasedkinpv/gotenberg-pdf
  * Description: Wordpress plugin for creating PDF files from docker container Gotenberg (thecodingmachine)
- * Version:     1.0.1
+ * Version:     1.0.3
  * Author:      Ben Nasedkin
  * Author URI:  nasedk.in
  * License:     GNU GENERAL PUBLIC LICENSE
+ * GitHub Plugin URI: nasedkinpv/gotenberg-pdf
  * GitHub Plugin URI: https://github.com/nasedkinpv/gotenberg-pdf
  * 
  */
@@ -42,21 +43,18 @@ if (version_compare($wp_version, '3.9', "<")) {
 if (!class_exists('GOTENGERG_SERVICE')) :
     class GOTENGERG_SERVICE
     {
-        const DEBUG = 1;
-        private $theme = 'nordmarine';
         function __construct()
         {
-            $this->get_settings();
             // Plugin action links
-            add_filter('plugin_action_links', array($this, 'plugin_action_links'), 10, 2);
+            // add_filter('plugin_action_links', array($this, 'plugin_action_links'), 10, 2);
             // Activation hooks
             register_activation_hook(__FILE__, array($this, 'activate'));
             register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+            $settings = $this->get_settings();
             // Filterable init action
             add_action('init', array($this, 'init'), 0, 0);
-            add_filter('template_redirect', [$this, 'run']);
-
             // $this->run(); // non-filterable init action
+            add_filter('template_redirect', [$this, 'run']);
         }
 
         /**
@@ -68,12 +66,12 @@ if (!class_exists('GOTENGERG_SERVICE')) :
         public function activate()
         {
             // set defaults
-            $this->webserver = 'http://nginx:80';
-            $this->gotenberg_uri = 'http://gotenberg:3000';
-            $this->query_for_print = 'print';
-            $this->query_for_pdf = 'pdf';
-            $this->custom_post_type = 'page';
-            $this->pdf_folder = get_stylesheet_directory() . '/print/';
+            // $this->webserver = 'http://nginx:80';
+            // $this->gotenberg_uri = 'http://gotenberg:3000';
+            // $this->query_for_print = 'print';
+            // $this->query_for_pdf = 'pdf';
+            // $this->custom_post_type = 'page';
+            // $this->pdf_folder = get_stylesheet_directory() . '/print/';
         }
 
 
@@ -109,46 +107,65 @@ if (!class_exists('GOTENGERG_SERVICE')) :
          */
         public function run()
         {
-            // echo '<pre>';
-            // var_dump($this);
-            // var_dump($_REQUEST);
-            // echo '</pre>';
+            // check post type
+            if ($this->check_service()) {
 
-            if ($mode = @$_REQUEST[$this->query_for_pdf] && get_post_type() == $this->custom_post_type) {
-
+                if (get_post_type() !== $this->custom_post_type) return null;
+                // check non-related request
+                if (
+                    !isset($_REQUEST[$this->query_for_pdf]) &&
+                    !isset($_REQUEST[$this->query_for_print])
+                ) return null;
+                // set mode
+                $mode = @$_REQUEST[$this->query_for_pdf] ?: null;
+                // return version for print
+                if (@$_REQUEST[$this->query_for_print] === '1') {
+                    // loads template only for print
+                    include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
+                    exit;
+                } elseif (@$_REQUEST[$this->query_for_print] === 'broker') {
+                    // load *-broker template
+                    $this->template_name  .=  '-broker';
+                    include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
+                    exit;
+                }
                 $this->request_uri = $this->webserver . str_replace(get_home_url(), '', get_permalink());
-                $this->request_uri .= '?' . $this->query_print . '=1';
-                $this->filename = self::get_pdf_filename();
-                $this->file_path = $this->pdf_folder . $this->filename;
-                $this->file_uri = get_stylesheet_directory_uri() . '/print/' . $this->filename;
-                // check mode
-                $mode = intval($mode);
+                $this->file_name = self::get_pdf_filename();
+                // switch mode
                 switch ($mode) {
                     case 1:
                         // regular download, if not exist create, if exist download.
+                        $this->request_uri .= '?' . $this->query_for_print . '=1';
                         if (file_exists($this->pdf_folder . self::get_pdf_filename())) {
-                            readfile($this->file_path);
+                            // load exist file TODO
+                            $this->generatePDF($this->request_uri, $this->file_name);
                         } else {
-                            $this->generatePDF($this->request_uri, $this->file_path);
-                            readfile($this->file_path);
+                            $this->request_uri .= '?' . $this->query_for_print . '=1';
+                            $this->generatePDF($this->request_uri, $this->file_name);
+                            // readfile($this->file_path);
                         }
                         break;
-                    case 2:
+                    case 'overwrite':
                         // overwrite
-                        $this->generatePDF($this->request_uri, $this->file_path);
-                        readfile($this->file_path);
+                        $this->request_uri .= '?' . $this->query_for_print . '=1';
+                        $this->generatePDF($this->request_uri, $this->file_name);
+                        // readfile($this->file_path);
                         break;
+                    case 'broker':
+                        // if (file_exists($this->pdf_folder . self::get_pdf_filename($broker = true))) {
+                        //     readfile($this->pdf_folder . self::get_pdf_filename($broker = true));
+                        //     return null;
+                        // }
+                        // check broker file
+                        $this->generatePDF($this->request_uri, $this->file_name);
+                        $this->file_name = self::get_pdf_filename($broker = true);
+                        $this->template_name  .= '-broker';
+                        $this->request_uri .= '?' . $this->query_for_print . '=broker';
+                        $this->generatePDF($this->request_uri, $this->file_name);
+                        // readfile($this->file_path);
                     default:
-                        $this->generatePDF($this->request_uri, $this->file_path);
-                        readfile($this->file_path);
-                        break;
+                        exit;
                 }
-                exit;
-                // run generate
-            }
-            if (@$_REQUEST[$this->query_for_print] === '1') {
-                // loads template only for print
-                include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->theme . '/index.php');
                 exit;
             }
         }
@@ -161,7 +178,15 @@ if (!class_exists('GOTENGERG_SERVICE')) :
          */
         public function check_service()
         {
-            return true; // false
+            $host = $this->gotenberg_uri;
+            $host = preg_replace('#^https?://#', '', $host);
+            $connection = @fsockopen($host);
+            if (is_resource($connection)) {
+                fclose($connection);
+                return true;
+            } else {
+                return false;
+            }
         }
 
         /**
@@ -173,80 +198,24 @@ if (!class_exists('GOTENGERG_SERVICE')) :
         public function get_settings()
         {
             $options = get_option('gotenberg_pdf_settings');
-            // var_dump($options);
-            $this->webserver = $options['webserver_uri'] ?: 'http://nginx:80';
-            $this->gotenberg_uri = $options['gotenberg_uri'] ?: 'http://gotenberg:3000';
+            $this->webserver = 'http://' . $options['webserver_uri'] ?: 'http://nginx:80';
+            $this->gotenberg_uri = 'http://' .  $options['gotenberg_uri'] ?: 'http://gotenberg:3000';
             $this->query_for_print = $options['query_for_print'] ?: 'print';
             $this->query_for_pdf = $options['query_for_pdf'] ?: 'pdf';
             $this->custom_post_type = $options['custom_post_type'] ?: 'page';
             $this->pdf_folder = get_stylesheet_directory() . '/print/';
+            $this->template_name = $options['template_name'] ?: 'default';
             return $options;
         }
-
-
-        /**
-         * Loads template from plugin-folder/templates/
-         * 
-         * @param $template
-         * @return null
-         */
-        public function load_template()
-        {
-        }
-
 
         /**
          * PDF filename
          * 
-         * @param $post
-
+         * @global $post
+         * @param $broker
+         * @return String 
          */
-
-        function watch_query_and_post_type($html)
-        {
-            if ($this->print == 1) $this->load_template();
-            if (get_post_type() == $this->post_type and $this->mode) {
-                $this->request_uri = $this->webserver . str_replace(get_home_url(), '', get_permalink());
-                $this->request_uri .= '?' . $this->query_print . '=1';
-                $this->filename = self::get_pdf_filename();
-                $this->file_path = $this->pdf_folder . $this->filename;
-                $this->file_uri = get_stylesheet_directory_uri() . '/print/' . $this->filename;
-                if ($this::DEBUG) var_dump($this);
-                if ($this->mode) {
-                    header('Content-type:application/pdf');
-                    header('Content-Disposition:attachment; filename="' . $this->filename . '"');
-                    switch ($this->mode) {
-                        case 1:
-                            // regular download, if not exist create, if exist download.
-                            if (file_exists($this->pdf_folder . self::get_pdf_filename())) {
-                                readfile($this->file_path);
-                            } else {
-                                $this->generatePDF($this->request_uri, $this->file_path);
-                                readfile($this->file_path);
-                            }
-                            break;
-                        case 2:
-                            // overwrite
-                            $this->generatePDF($this->request_uri, $this->file_path);
-                            readfile($this->file_path);
-                            break;
-                        default:
-                            $this->generatePDF($this->request_uri, $this->file_path);
-                            readfile($this->file_path);
-                            break;
-                    }
-                    exit;
-                }
-            } else {
-                return $html;
-            }
-        }
-        public function load()
-        {
-            // add_action('admin_menu', [$this, 'add_plugin_options_page']);
-            // add_action('admin_init', [$this, 'add_plugin_settings']);
-        }
-        function get_pdf_filename(): String
+        function get_pdf_filename($broker = false): String
         {
             global $post;
             $filename = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -256,49 +225,61 @@ if (!class_exists('GOTENGERG_SERVICE')) :
             $filename = trim($filename, '-');
             $filename = preg_replace('~-+~', '-', $filename);
             $filename = strtolower($filename);
-            $filename .= '-' . get_the_ID() . '.pdf';
+            $filename .= '-' . get_the_ID();
+            if ($broker === true) $filename .= '-broker';
+            $filename .= '.pdf';
             return $filename;
         }
 
-        function generatePDF($url, $filepath)
+        /** 
+         * Main function to generate print-friendly version to file
+         * @var header.html
+         * @var footer.html
+         * @return PDF in browser and save in file 
+         **/
+
+        function generatePDF($url, $file_name)
         {
-            $client = new Client($this->gotenberg, new \Http\Adapter\Guzzle6\Client());
-            $request = new URLRequest($url);
-            // // $request->setAssets($assets);
-            // $request->setPaperSize(URLRequest::A4);
-            // $request->setMargins([0.2, 0.2, 0.2, 0.2]);
-            // $request->setWaitDelay(2.5);
-            // $request->setWaitTimeout(10);
-
-            // $client->store($request, $filepath);
-            // return $request;
-
-            // try {
-            $request = new URLRequest($url);
+            $client = new Client($this->gotenberg_uri, new \Http\Adapter\Guzzle6\Client());
+            $file_path = $this->pdf_folder . $file_name;
+            // if (file_exist()) {
+            //     # code...
+            // }
             // $header = DocumentFactory::makeFromPath('header.html', __DIR__ . '/themes/nordmarine/header.html');
             $footer = DocumentFactory::makeFromPath('footer.html', __DIR__ . '/themes/nordmarine/footer.html');
-            $request->setPaperSize(URLRequest::A4);
-            $request->setMargins([0.4, 0.75, 0.4, 0.4]);
-            $request->setWaitDelay(2.5);
-            $request->setWaitTimeout(10);
-            $request->setFooter($footer);
-            // $request->setHeader($header);
-            // dd($this);
-            $client->store($request, $filepath);
-            // return $request;
             try {
-                return $client->post($request);
+                $request = new URLRequest($url);
+                $request->setPaperSize(URLRequest::A4);
+                $request->setMargins([0.4, 0.75, 0.4, 0.4]);
+                $request->setWaitDelay(2.5);
+                $request->setWaitTimeout(10);
+                $request->setFooter($footer);
+                // $request->setHeader($header);
+                $client->store($request, $file_path);
+                // $client->post($request);
+                $fileinfo = pathinfo($file_path);
+                // $sendname = $fileinfo['filename'] . '.' . strtoupper($fileinfo['extension']);
+
+                // header('Content-type:application/pdf');
+                // header('Content-Disposition:attachment; filename="' . $this->filename . '"');
+                header('Content-Type: application/pdf');
+                header("Content-Disposition: attachment; filename=\"$file_name\"");
+                header('Content-Length: ' . filesize($file_path));
+                readfile($file_path);
             } catch (RequestException $e) {
-                var_dump($this);
+                echo '<pre>';
+                var_dump($e);
+                echo '</pre>';
                 # this exception is thrown if given paper size or margins are not correct.
             } catch (ClientException $e) {
+                echo '<pre>';
+                echo 'client error';
+                var_dump($e);
+                echo '</pre>';
                 # this exception is thrown by the client if the API has returned a code != 200.
-                var_dump($this);
-            } catch (\Exception $e) {
-                # some (random?) exception.
             }
         }
     }
 endif;
 $plugin = new GOTENGERG_SERVICE();
-$plugin->load();
+// $plugin->load();

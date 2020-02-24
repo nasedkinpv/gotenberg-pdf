@@ -108,9 +108,15 @@ if (!class_exists('GOTENGERG_SERVICE')) :
         public function run()
         {
             // check post type
-            if ($this->check_service()) {
+            echo is_page_template($this->custom_page_template);
 
-                if (get_post_type() !== $this->custom_post_type) return null;
+            if ($this->check_service()) {
+                if (get_post_type() == $this->custom_post_type)
+                    $fallback = false;
+                if (is_page_template($this->custom_page_template))
+                    $fallback = false;
+                if ($fallback) return null;
+
                 // check non-related request
                 if (
                     !isset($_REQUEST[$this->query_for_pdf]) &&
@@ -202,7 +208,8 @@ if (!class_exists('GOTENGERG_SERVICE')) :
             $this->gotenberg_uri = 'http://' .  $options['gotenberg_uri'] ?: 'http://gotenberg:3000';
             $this->query_for_print = $options['query_for_print'] ?: 'print';
             $this->query_for_pdf = $options['query_for_pdf'] ?: 'pdf';
-            $this->custom_post_type = $options['custom_post_type'] ?: 'page';
+            $this->custom_post_type = $options['custom_post_type'] ?: 'post';
+            $this->custom_page_template = $options['custom_page_template'] ?: 'page';
             $this->pdf_folder = get_stylesheet_directory() . '/print/';
             $this->template_name = $options['template_name'] ?: 'default';
             return $options;

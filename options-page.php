@@ -69,6 +69,13 @@ function gotenberg_pdf_settings_init()
         'gotenberg_pdf_pluginPage_section'
     );
     add_settings_field(
+        'custom_page_template',
+        __('Custom page template', 'gotenberg'),
+        'custom_page_template_render',
+        'pluginPage',
+        'gotenberg_pdf_pluginPage_section'
+    );
+    add_settings_field(
         'template_name',
         __('Template name', 'gotenberg'),
         'template_name_render',
@@ -145,6 +152,15 @@ function custom_post_type_render()
     $options = get_option('gotenberg_pdf_settings');
 ?>
     <input type='text' name='gotenberg_pdf_settings[custom_post_type]' value='<?= $options['custom_post_type'] ?: 'yacht' ?>'>
+<?php
+
+}
+function custom_page_template_render()
+{
+
+    $options = get_option('gotenberg_pdf_settings');
+?>
+    <input type='text' name='gotenberg_pdf_settings[custom_page_template]' value='<?= $options['custom_page_template'] ?: 'page' ?>'>
 <?php
 
 }

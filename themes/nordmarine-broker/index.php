@@ -277,7 +277,7 @@ endif;
     <? if ($yp = get_field('yacht_plans')) : ?>
       <div class="pdf-break"></div>
       <div class="pdf-header">
-        <div class="pdf-header__left">
+        <!-- <div class="pdf-header__left">
           <div class="pdf-header__left-body">
             <div class="pdf-header__logo"></div>
           </div>
@@ -288,7 +288,7 @@ endif;
               <p class="pdf-contacts__text">119034, Москва, Бутиковский пер., 7<br><span>Т</span>+7 495 775 11 00<br><span>M</span>+7 985 201 01 01<br><span>E</span>brokerage@nordmarine.ru<br><span>W</span>nordmarine.ru</p>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="pdf-header">
         <div class="pdf-header__left">

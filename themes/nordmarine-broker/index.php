@@ -324,6 +324,7 @@ endif;
     } else {
       $gallery = get_field('yacht_pdf_gallery');
     }
+    $gallery = array_slice($gallery, 0, 16);
     ?>
     <? if ($gallery != NULL && sizeof($gallery)) : ?>
       <div class="pdf-break"></div>
@@ -339,7 +340,7 @@ endif;
               </div>
             <? endforeach; ?>
           </div>
-          <?php if ($i == "3" or $i == "7" or $i == "11" or $i == "15") : ?>
+          <?php if ($i == "3") : ?>
             <div class="pdf-break"></div>
           <?php endif ?>
         <? endforeach; ?>

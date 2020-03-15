@@ -5,7 +5,7 @@
  * Plugin Name: Gotenberg PDF
  * Plugin URI:  https://github.com/nasedkinpv/gotenberg-pdf
  * Description: Wordpress plugin for creating PDF files from docker container Gotenberg (thecodingmachine)
- * Version:     1.0.5
+ * Version:     1.0.6
  * Author:      Ben Nasedkin
  * Author URI:  nasedk.in
  * License:     GNU GENERAL PUBLIC LICENSE
@@ -109,6 +109,7 @@ if (!class_exists('GOTENGERG_SERVICE')) :
         {
             // check post type
             if ($this->check_service()) {
+                $exit = true;
                 if (get_post_type() == $this->custom_post_type)
                     $exit = false;
                 if (is_page_template($this->custom_page_template))
@@ -255,7 +256,7 @@ if (!class_exists('GOTENGERG_SERVICE')) :
                 $request = new URLRequest($url);
                 $request->setPaperSize(URLRequest::A4);
                 $request->setMargins([0.4, 0.75, 0.4, 0.4]);
-                $request->setWaitDelay(2.5);
+                $request->setWaitDelay(5.5);
                 $request->setWaitTimeout(10);
                 $request->setFooter($footer);
                 // $request->setHeader($header);

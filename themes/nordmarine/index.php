@@ -186,8 +186,8 @@ endif;
               <? foreach ($pdfRows as $field_name => $field_value) : ?>
 
                 <? $field = (get_field($field_name, $post->ID) != '')
-                    ? get_field_object($field_name, $post->ID)
-                    : get_field_object($field_value['substitute'], $post->ID); ?>
+                  ? get_field_object($field_name, $post->ID)
+                  : get_field_object($field_value['substitute'], $post->ID); ?>
 
                 <? if ($field['value']) : ?>
                   <div class="pdf-characteristics-table__row">
@@ -255,7 +255,7 @@ endif;
               </div>
             </div>
           <? endif;
-            if (key_exists(1, $arrays)) : ?>
+          if (key_exists(1, $arrays)) : ?>
 
             <div class="pdf-equipment__right">
               <div class="pdf-equipment__right-body">
@@ -307,8 +307,8 @@ endif;
         <div class="pdf-deck">
           <div class="pdf-deck__topic">План палуб</div>
           <? foreach ($yp as $planKey => $plan) :
-              $field_name = 'yacht_plan_header_' . ($planKey + "1");
-              ?>
+            $field_name = 'yacht_plan_header_' . ($planKey + "1");
+          ?>
             <div class="pdf-deck__item">
               <div class="pdf-deck__img"><img src="<? echo $plan['url']; ?>" alt="" title=""></div>
               <p class="pdf-deck__text"><? the_field($field_name, @$post->ID) ?></p>
@@ -324,6 +324,7 @@ endif;
     } else {
       $gallery = get_field('yacht_pdf_gallery');
     }
+    $gallery = array_slice($gallery, 0, 16);
     ?>
     <? if ($gallery != NULL && sizeof($gallery)) : ?>
       <div class="pdf-break"></div>
@@ -339,7 +340,7 @@ endif;
               </div>
             <? endforeach; ?>
           </div>
-          <?php if ($i == "3" or $i == "7" or $i == "11" or $i == "15") : ?>
+          <?php if ($i == "3") : ?>
             <div class="pdf-break"></div>
           <?php endif ?>
         <? endforeach; ?>

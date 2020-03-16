@@ -5,7 +5,7 @@
  * Plugin Name: Gotenberg PDF
  * Plugin URI:  https://github.com/nasedkinpv/gotenberg-pdf
  * Description: Wordpress plugin for creating PDF files from docker container Gotenberg (thecodingmachine)
- * Version:     1.0.7
+ * Version:     1.0.8
  * Author:      Ben Nasedkin
  * Author URI:  nasedk.in
  * License:     GNU GENERAL PUBLIC LICENSE
@@ -105,74 +105,58 @@ if (!class_exists('GOTENGERG_SERVICE')) :
          * @param null
          * @return boolean
          */
-        public function run()
+        public function template_load($broker = false)
         {
-            // check post type
-            if ($this->check_service()) {
-                $exit = true;
-                if (get_post_type() == $this->custom_post_type)
-                    $exit = false;
-                if (is_page_template($this->custom_page_template))
-                    $exit = false;
-                // check non-related request
-                if (
-                    !isset($_REQUEST[$this->query_for_pdf]) &&
-                    !isset($_REQUEST[$this->query_for_print])
-                ) $exit = true;
-                if ($exit) return null;
-                // set mode
-                $mode = @$_REQUEST[$this->query_for_pdf] ?: null;
-                // return version for print
-                if (@$_REQUEST[$this->query_for_print] === '1' or @$_REQUEST[$this->query_for_print] === 1) {
-                    $mode = 1;
-                    // loads template only for print
-                    include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
-                    exit;
-                } elseif (@$_REQUEST[$this->query_for_print] === 'broker') {
-                    // load *-broker template
-                    $this->template_name  .=  '-broker';
-                    include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
-                    exit;
-                }
-                $this->request_uri = $this->webserver . str_replace(get_home_url(), '', get_permalink());
-                $this->file_name = self::get_pdf_filename();
-                // switch mode
-                switch ($mode) {
-                    case 1 or '1':
-                        // regular download, if not exist create, if exist download.
-                        $this->request_uri .= '?' . $this->query_for_print . '=1';
-                        // if (file_exists($this->pdf_folder . self::get_pdf_filename())) {
-                        // load exist file TODO
-                        // $this->generatePDF($this->request_uri, $this->file_name);
-                        // } else {
-                        // $this->request_uri .= '?' . $this->query_for_print . '=1';
-                        $this->generatePDF($this->request_uri, $this->file_name);
-                        // readfile($this->file_path);
-                        // }
-                        break;
-                    case 'overwrite':
-                        // overwrite
-                        $this->request_uri .= '?' . $this->query_for_print . '=1';
-                        $this->generatePDF($this->request_uri, $this->file_name);
-                        // readfile($this->file_path);
-                        break;
-                    case 'broker':
-                        // if (file_exists($this->pdf_folder . self::get_pdf_filename($broker = true))) {
-                        //     readfile($this->pdf_folder . self::get_pdf_filename($broker = true));
-                        //     return null;
-                        // }
-                        // check broker file
-                        $this->generatePDF($this->request_uri, $this->file_name);
-                        $this->file_name = self::get_pdf_filename($broker = true);
-                        $this->template_name  .= '-broker';
-                        $this->request_uri .= '?' . $this->query_for_print . '=broker';
-                        $this->generatePDF($this->request_uri, $this->file_name, $broker = true);
-                    default:
-                        exit;
-                }
+            if ($broker) {
+                // load *-broker template
+                $this->template_name  .=  '-broker';
+                include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
+                exit;
+            } else {
+                // loads template only for print
+                include_once(plugin_dir_path(__FILE__) . '/themes/' . $this->template_name  . '/index.php');
                 exit;
             }
         }
+        public function generate_handler($broker = false)
+        {
+            $this->request_uri = $this->webserver . str_replace(get_home_url(), '', get_permalink());
+            $this->file_name = self::get_pdf_filename();
+            if ($broker === false) :
+                $this->print_mode == 'regular';
+                $this->request_uri .= '?' . $this->query_for_print . '=1';
+                $this->generatePDF($this->request_uri, $this->file_name);
+            endif;
+            if ($broker === true) :
+                $this->print_mode === 'broker';
+                $this->request_uri .= '?' . $this->query_for_print . '=broker';
+                $this->file_name = self::get_pdf_filename($broker = true);
+                $this->generatePDF($this->request_uri, $this->file_name, $broker = true);
+            endif;
+        }
+        public function run()
+        {
+            // check post type
+            $bypass = true;
+            if (get_post_type() == $this->custom_post_type) $bypass = false;
+            if (is_page_template($this->custom_page_template) === true) $bypass = true;
+            if ($bypass === true) return null;
+            // check for  service
+            if (!$this->check_service()) return null;
+            // check non-related request
+            if (isset($_REQUEST[$this->query_for_pdf]))
+                $this->generate_mode = $_REQUEST[$this->query_for_pdf];
+            if (isset($_REQUEST[$this->query_for_print]))
+                $this->print_mode = $_REQUEST[$this->query_for_print];
+            // return version for print
+            if ($this->print_mode === 'broker') $this->template_load($broker = true);
+            if ($this->print_mode === '1') $this->template_load($broker = false);
+
+            if ($this->generate_mode === 'broker') $this->generate_handler($broker = true);
+            if ($this->generate_mode === '1' || $this->generate_mode === 1) $this->generate_handler($broker = false);
+            return null;
+        }
+
 
         /**
          * Check availability on Gotenberg service

@@ -2,13 +2,11 @@
 add_action('admin_menu', 'gotenberg_pdf_add_admin_menu');
 add_action('admin_init', 'gotenberg_pdf_settings_init');
 
-
 function gotenberg_pdf_add_admin_menu()
 {
 
     add_options_page('Gotenberg Docker Settings', 'Gotenberg Docker Settings', 'manage_options', 'gotenberg_pdf', 'gotenberg_pdf_options_page');
 }
-
 
 function gotenberg_pdf_settings_init()
 {
@@ -84,12 +82,11 @@ function gotenberg_pdf_settings_init()
     );
 }
 
-
 function status_gotenberg_render()
 {
     $options = get_option('gotenberg_pdf_settings');
 
-    $host = $options['gotenberg_uri'];
+    $host = @$options['gotenberg_uri'];
     $host = preg_replace('#^https?://#', '', $host);
 
     $connection = @fsockopen($host);
@@ -99,59 +96,55 @@ function status_gotenberg_render()
     } else {
         echo $host . ' is not responding.';
     }
-?>
+    ?>
 <?php
 
 }
 function webserver_uri_render()
 {
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?= $options['webserver_uri'] ?: 'http://nginx:80' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[webserver_uri]' value='<?=@$options['webserver_uri'] ?: 'http://nginx:80'?>'>
 <?php
 
 }
-
 
 function gotenberg_uri_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?= $options['gotenberg_uri'] ?: 'http://gotenberg:3000' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[gotenberg_uri]' value='<?=@$options['gotenberg_uri'] ?: 'http://gotenberg:3000'?>'>
 <?php
 
 }
-
 
 function query_for_print_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[query_for_print]' value='<?= $options['query_for_print'] ?: 'print' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[query_for_print]' value='<?=@$options['query_for_print'] ?: 'print'?>'>
 <?php
 
 }
-
 
 function query_for_pdf_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[query_for_pdf]' value='<?= $options['query_for_pdf'] ?: 'pdf' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[query_for_pdf]' value='<?=@$options['query_for_pdf'] ?: 'pdf'?>'>
 <?php
 
 }
-
 
 function custom_post_type_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[custom_post_type]' value='<?= $options['custom_post_type'] ?: 'yacht' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[custom_post_type]' value='<?=@$options['custom_post_type'] ?: 'yacht'?>'>
 <?php
 
 }
@@ -159,8 +152,8 @@ function custom_page_template_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[custom_page_template]' value='<?= $options['custom_page_template'] ?: 'page' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[custom_page_template]' value='<?=@$options['custom_page_template'] ?: 'page'?>'>
 <?php
 
 }
@@ -169,12 +162,11 @@ function template_name_render()
 {
 
     $options = get_option('gotenberg_pdf_settings');
-?>
-    <input type='text' name='gotenberg_pdf_settings[template_name]' value='<?= $options['template_name'] ?: 'default' ?>'>
+    ?>
+    <input type='text' name='gotenberg_pdf_settings[template_name]' value='<?=@$options['template_name'] ?: 'default'?>'>
 <?php
 
 }
-
 
 function gotenberg_pdf_settings_section_callback()
 {
@@ -182,20 +174,19 @@ function gotenberg_pdf_settings_section_callback()
     echo __('For fully functional pdf creation you must have docker enviroment and gotenberg container running', 'gotenberg');
 }
 
-
 function gotenberg_pdf_options_page()
 {
 
-?>
+    ?>
     <form action='options.php' method='post'>
 
         <h2>Gotenberg Docker Settings</h2>
 
         <?php
-        settings_fields('pluginPage');
-        do_settings_sections('pluginPage');
-        submit_button();
-        ?>
+settings_fields('pluginPage');
+    do_settings_sections('pluginPage');
+    submit_button();
+    ?>
 
     </form>
 <?php
